@@ -26,7 +26,8 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
     Main execution code
     '''
     table_name_full = '"' + schema_name + '"."' + table_name + '"'
-    data = snowpark_session.table(table_name_full).to_pandas().head()
+    data = snowpark_session.table(table_name_full).to_pandas()
+    data.drop('_timestamp', axis=1, inplace=True)
 
     # Extract basic descriptive statistics
     row_cnt = data.shape[0]
