@@ -256,7 +256,7 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
             empty = pd.DataFrame({'count': [], 'badRate': [], 'trainCount': [], 'trainBadRate': [], 'testCount': [],
                                     'testBadRate': [], 'month': []})
             snowpark_session.create_dataframe(empty).write.mode("overwrite").save_as_table("monthly_bad_rate")#.to_csv(tables_out_path + '/monthlyBadRate.csv', index=False)
-            logging.info('[WARNING] Monthly bad rate was not calculated due to: ' + str(e))
+            
 
         # Drop DATE columns from the dataset to run binary classification
         if 'Date_Start' in train.columns:
@@ -286,7 +286,6 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
         test_y = test['target']
 
         # build model
-        logging.info('[INFO] Running XGBoost...')
         model = XGBClassifier(n_estimators=500, objective='binary:logistic', gamma=0.1, max_depth=3, eta=0.1)
         model.fit(train_x, train_y, eval_set=[(test_x, test_y)], eval_metric='auc', early_stopping_rounds=25)
 
