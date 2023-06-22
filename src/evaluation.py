@@ -406,7 +406,7 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
                 {'ModelName': 'GradientBoosting', 'Accuracy': acc_gbk_cv, 'GiniTest': gbk_cv_gini,
                     'BestParams': gbk_cv_best_param, 'BestScore': gbk_cv_best_score}, ignore_index=True)
 
-        other_models['BestParams'] = other_models['BestParams'].apply(lambda x: str(x))
+        other_models['BestParams'] = other_models['BestParams'].astype(str).encode('utf-8')
         snowpark_session.create_dataframe(other_models).write.mode("overwrite").save_as_table("other_models")#.to_csv(tables_out_path + '/otherModels.csv', index=False)
     else:
         corr = pd.DataFrame({"variable": [], "variableName": [], "value": []})
@@ -424,5 +424,5 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
         snowpark_session.create_dataframe(top25predictors).write.mode("overwrite").save_as_table("top_predictors")#.to_csv('out/tables/top25predictors.csv', index=False)
         other_models = pd.DataFrame(
             {"ModelName": [], "Accuracy": [], "GiniTest": [], "BestParams": [], "BestScore": []})
-        other_models['BestParams'] = other_models['BestParams'].apply(lambda x: str(x))
+        other_models['BestParams'] = other_models['BestParams'].astype(str).encode('utf-8')
         snowpark_session.create_dataframe(other_models).write.mode("overwrite").save_as_table("other_models")#.to_csv('out/tables/other_models.csv', index=False)
