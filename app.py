@@ -13,7 +13,13 @@ def main():
     table_name = st.selectbox("Table",tables)
 
     columns = list_columns(schema_name, table_name)
-    date_column_name = st.selectbox("Date Column", columns)
+    enable_dropdown = st.checkbox("I want to provide Date Column")
+
+    if enable_dropdown:
+        date_column_name = st.selectbox("Date Column", columns)
+    else:
+        date_column_name = ''
+
     target_column_name = st.selectbox("Target Column", columns)
     
     solve_missing_action = st.selectbox("Solve Missing Action", 

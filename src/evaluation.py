@@ -57,7 +57,7 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
     if date_column not in ["", "Date_Start"]:
         data["Date_Start"] = data[date_column]
         data.drop(date_column, axis=1, inplace=True)
-        all_columns.remove(target_column)
+        all_columns.remove(date_column)
 
     if 'target' in all_columns:
         all_columns.remove('target')
