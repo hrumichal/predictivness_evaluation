@@ -131,7 +131,7 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
     # IF target is present, features WOE will be calculated and model will be built
     if 'target' in data.columns:
         data = data.dropna(subset=['target'])
-        data['target'] = data['target'].astype(np.float)
+        data['target'] = data['target'].astype(float)
 
         # Solve missing values
         data = solve_missing(data, missing_action)
