@@ -10,5 +10,6 @@ streamlit-aggrid==0.3.4.post3
 hydralit_components==1.0.10
 Pillow==9.5.0
 streamlit-kpi==0.0.36
-sklearn
+scikit-learn
+tqdm
 xgboost
