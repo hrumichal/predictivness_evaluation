@@ -117,7 +117,7 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
         variable_code_mapping = variable_code_mapping.append({"VariableName": variable + '_WOE', "Code": code},
                                                                 ignore_index=True)
         j += 1
-    variable_code_mapping..write.mode("overwrite").save_as_table("variable_code_mapping")#to_csv(tables_out_path + '/variableCodeMapping.csv', index=False)
+    variable_code_mapping.write.mode("overwrite").save_as_table("variable_code_mapping")#to_csv(tables_out_path + '/variableCodeMapping.csv', index=False)
 
     # ####### OUT ##########
     # description_out - table contains more detailed statistics of individual columns
