@@ -317,7 +317,7 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
                                         "AccuracyTrain": [accuracy_train],
                                         "AccuracyTest": [accuracy_test]
                                         })
-        xgboost_result.write.mode("overwrite").save_as_table("xgboost_result")#.to_csv(tables_out_path + '/xgboostResult.csv', index=False)
+        snowpark_session.create_dataframe(xgboost_result).write.mode("overwrite").save_as_table("xgboost_result")#.to_csv(tables_out_path + '/xgboostResult.csv', index=False)
 
         # top25predictors
         top25predictors = pd.DataFrame(
