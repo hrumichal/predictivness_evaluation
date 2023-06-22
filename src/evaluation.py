@@ -97,7 +97,8 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
         }
     )
 
-    general_out.to_csv(tables_out_path + '/general.csv', index=False)
+    #general_out.to_csv(tables_out_path + '/general.csv', index=False)
+    general_out.write.mode("overwrite").save_as_table("general")
 
     # Extract more detailed information about individual columns
     description_out = data.describe(include='all').transpose()
@@ -116,13 +117,13 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
         variable_code_mapping = variable_code_mapping.append({"VariableName": variable + '_WOE', "Code": code},
                                                                 ignore_index=True)
         j += 1
-    variable_code_mapping.to_csv(tables_out_path + '/variableCodeMapping.csv', index=False)
+    variable_code_mapping..write.mode("overwrite").save_as_table("variable_code_mapping")#to_csv(tables_out_path + '/variableCodeMapping.csv', index=False)
 
     # ####### OUT ##########
     # description_out - table contains more detailed statistics of individual columns
     description_out['VariableName'] = description_out['ColumnName'] + '_WOE'
     description_out = pd.merge(description_out, variable_code_mapping, on='VariableName', how='left')
-    description_out.to_csv(tables_out_path + '/description.csv', index=False)
+    description_out.write.mode("overwrite").save_as_table("description")#to_csv(tables_out_path + '/description.csv', index=False)
 
     # ######### PROCESS THE DATA AND EVALUATE PREDICTIVE VALUE ############
     # WOE TRANSFORMATION
@@ -172,8 +173,8 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
         data_woe_out_melt_group[
             'Order'] = np.nan  # will be filled by second transformation after evaluating predictors
 
-        data_woe_out_melt.to_csv(tables_out_path + '/DataWOETransform.csv', index=False)
-        data_woe_out_melt_group.to_csv(tables_out_path + '/DataWOETransformGroup.csv', index=False)
+        data_woe_out_melt.write.mode("overwrite").save_as_table("data_woe")#to_csv(tables_out_path + '/DataWOETransform.csv', index=False)
+        data_woe_out_melt_group.write.mode("overwrite").save_as_table("data_woe_group")#.to_csv(tables_out_path + '/DataWOETransformGroup.csv', index=False)
 
     else:
         variable_code_mapping = pd.DataFrame({"VariableName": [], "Code": []})
@@ -183,9 +184,9 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
             {"VariableName": [], "Date_Start": [], "Value": [], "EventSum": [], "EventCount": [], "Code": [],
                 "Order": []})
 
-        data_woe_out_melt.to_csv(tables_out_path + '/DataWOETransform.csv', index=False)
-        data_woe_out_melt_group.to_csv(tables_out_path + '/DataWOETransformGroup.csv', index=False)
-        variable_code_mapping.to_csv(tables_out_path + '/variableCodeMapping.csv', index=False)
+        data_woe_out_melt.write.mode("overwrite").save_as_table("data_woe")#.to_csv(tables_out_path + '/DataWOETransform.csv', index=False)
+        data_woe_out_melt_group.write.mode("overwrite").save_as_table("data_woe_group")#.to_csv(tables_out_path + '/DataWOETransformGroup.csv', index=False)
+        variable_code_mapping.write.mode("overwrite").save_as_table("variable_code_mapping")#.to_csv(tables_out_path + '/variableCodeMapping.csv', index=False)
 
 
     # Load -in- dataset
@@ -217,7 +218,7 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
         corr = corr.melt(id_vars=["variable"], var_name="VariableName", value_name="Value")
         # ####### OUT ##########
         # Correlation matrix
-        corr.to_csv(tables_out_path + '/correlation.csv', index=False)
+        corr.write.mode("overwrite").save_as_table("correlation")#.to_csv(tables_out_path + '/correlation.csv', index=False)
 
         # Split dataset to train and test
         data['DAY'] = pd.to_numeric(pd.to_datetime(data['Date_Start'], format='%Y-%m-%d').dt.strftime('%Y%m%d'))
@@ -248,12 +249,12 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
             # ####### OUT ##########
             # monthlyBadRate - table with share of BADS (target == 1) in dataset
             res_restrain_restest['month'] = res_restrain_restest.index
-            res_restrain_restest.to_csv(tables_out_path + '/monthlyBadRate.csv', index=False)
+            res_restrain_restest.write.mode("overwrite").save_as_table("monthly_bad_rate")#.to_csv(tables_out_path + '/monthlyBadRate.csv', index=False)
 
         except Exception as e:
             empty = pd.DataFrame({'count': [], 'badRate': [], 'trainCount': [], 'trainBadRate': [], 'testCount': [],
                                     'testBadRate': [], 'month': []})
-            empty.to_csv(tables_out_path + '/monthlyBadRate.csv', index=False)
+            empty.write.mode("overwrite").save_as_table("monthly_bad_rate")#.to_csv(tables_out_path + '/monthlyBadRate.csv', index=False)
             logging.info('[WARNING] Monthly bad rate was not calculated due to: ' + str(e))
 
         # Drop DATE columns from the dataset to run binary classification
@@ -316,20 +317,20 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
                                         "AccuracyTrain": [accuracy_train],
                                         "AccuracyTest": [accuracy_test]
                                         })
-        xgboost_result.to_csv(tables_out_path + '/xgboostResult.csv', index=False)
+        xgboost_result.write.mode("overwrite").save_as_table("xgboost_result")#.to_csv(tables_out_path + '/xgboostResult.csv', index=False)
 
         # top25predictors
         top25predictors = pd.DataFrame(
             {'features': test_x.columns, 'importance': model.feature_importances_}).\
             sort_values('importance', ascending=False).head(25)
 
-        top25predictors.to_csv(tables_out_path + '/top25predictors.csv', index=False)
+        top25predictors.write.mode("overwrite").save_as_table("top_predictors")#.to_csv(tables_out_path + '/top25predictors.csv', index=False)
         top25predictors['order'] = np.arange(len(top25predictors))
 
         data_woe = data_woe.merge(top25predictors, left_on='VariableName', right_on='features', how='left')
         data_woe.drop(['Order', 'features', 'importance'], axis=1, inplace=True)
         data_woe = data_woe.rename(columns={'order': 'Order'})
-        data_woe.to_csv(tables_out_path + '/DataWOETransformGroup.csv', index=False)
+        data_woe.write.mode("overwrite").save_as_table("data_woe_group")#.to_csv(tables_out_path + '/DataWOETransformGroup.csv', index=False)
         other_models = pd.DataFrame(
             {"ModelName": [], "Accuracy": [], "GiniTest": [], "BestParams": [], "BestScore": []})
 
@@ -405,21 +406,21 @@ def evaluate(schema_name, table_name, date_column, target_column, missing_action
                 {'ModelName': 'GradientBoosting', 'Accuracy': acc_gbk_cv, 'GiniTest': gbk_cv_gini,
                     'BestParams': gbk_cv_best_param, 'BestScore': gbk_cv_best_score}, ignore_index=True)
 
-        other_models.to_csv(tables_out_path + '/otherModels.csv', index=False)
+        other_models.write.mode("overwrite").save_as_table("other_models")#.to_csv(tables_out_path + '/otherModels.csv', index=False)
     else:
         corr = pd.DataFrame({"variable": [], "variableName": [], "value": []})
-        corr.to_csv(tables_out_path + '/correlation.csv', index=False)
+        corr.write.mode("overwrite").save_as_table("correlation")#.to_csv(tables_out_path + '/correlation.csv', index=False)
         monthly_br = pd.DataFrame(
             {"count": [], "badRate": [], "trainCount": [], "trainBadRate": [], "testCount": [], "testBadRate": [],
                 "month": []})
-        monthly_br.to_csv('out/tables/monthlyBadRate.csv', index=False)
+        monthly_br.write.mode("overwrite").save_as_table("monthly_bad_rate")#.to_csv('out/tables/monthlyBadRate.csv', index=False)
         xgboost_result = pd.DataFrame(
             {"ModelName": ["XGBoost"], "BaseScore": [], "Gamma": [], "MaxDepth": [], "N_estimators": [], "Eta": [],
                 "Objective": [], "ROC_AUCTrain": [], "ROC_AUCTest": [], "TrainGini": [], "TestGini": [],
                 "AccuracyTrain": [], "AccuracyTest": []})
-        xgboost_result.to_csv('out/tables/xgboost_result.csv', index=False)
+        xgboost_result.write.mode("overwrite").save_as_table("xgboost_result")#.to_csv('out/tables/xgboost_result.csv', index=False)
         top25predictors = pd.DataFrame({"features": [], "importance": []})
-        top25predictors.to_csv('out/tables/top25predictors.csv', index=False)
+        top25predictors.write.mode("overwrite").save_as_table("top_predictors")#.to_csv('out/tables/top25predictors.csv', index=False)
         other_models = pd.DataFrame(
             {"ModelName": [], "Accuracy": [], "GiniTest": [], "BestParams": [], "BestScore": []})
-        other_models.to_csv('out/tables/other_models.csv', index=False)
+        other_models.write.mode("overwrite").save_as_table("other_models")#.to_csv('out/tables/other_models.csv', index=False)
