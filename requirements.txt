@@ -1,0 +1,14 @@
+streamlit==1.22.0
+streamlit-authenticator==0.2.1
+git+https://github.com/keboola/sapi-python-client.git
+pandas==1.4
+plotly==5.9.0
+streamlit_extras
+snowflake-snowpark-python
+snowflake-snowpark-python[pandas]
+streamlit-aggrid==0.3.4.post3
+hydralit_components==1.0.10
+Pillow==9.5.0
+streamlit-kpi==0.0.36
+sklearn
+xgboost
